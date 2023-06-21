@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -49,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric login for my app")
-                .setSubtitle("Log in using your biometric credential")
+                .setTitle("Gimme finger")
+                .setSubtitle("Log in using your fingerprint")
                 .setAllowedAuthenticators(BIOMETRIC_STRONG | DEVICE_CREDENTIAL)
                 .build();
         Button biometricLoginButton = findViewById(R.id.biometric_login);
