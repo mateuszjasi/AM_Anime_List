@@ -10,9 +10,12 @@ import com.example.am_anime_list.model.Status;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -63,29 +66,40 @@ public class AnimeService {
         }
         List<Anime> animeList = new ArrayList<>();
 
-        for (Call<AnimeDetails> call : callList) {
-            try {
-                retrofit2.Response<AnimeDetails> response = call.execute();
-                if (response.isSuccessful()) {
-                    AnimeDetails animeDetails = response.body();
-                    if (animeDetails != null) {
-                        Anime anime = new Anime();
-                        anime.setId(animeDetails.getId());
-                        anime.setTitle(animeDetails.getTitle());
-                        anime.setImageUrl(animeDetails.getMainPicture().getLarge());
-                        anime.setMean(animeDetails.getMean() != 0 ? String.valueOf(animeDetails.getMean()) : "N/A");
-                        anime.setStatus(Status.valueOf(animeDetails.getStatus()));
-                        anime.setNumEpisodes(animeDetails.getNumEpisodes() != 0 ? String.valueOf(animeDetails.getNumEpisodes()) : "?");
+        AtomicInteger responseCount = new AtomicInteger(callList.size());
 
-                        animeList.add(anime);
+        for (Call<AnimeDetails> call : callList) {
+            call.enqueue(new Callback<AnimeDetails>() {
+                @Override
+                public void onResponse(Call<AnimeDetails> call, retrofit2.Response<AnimeDetails> response) {
+                    if (response.isSuccessful()) {
+                        AnimeDetails animeDetails = response.body();
+                        if (animeDetails != null) {
+                            Anime anime = new Anime();
+                            anime.setId(animeDetails.getId());
+                            anime.setTitle(animeDetails.getTitle());
+                            anime.setImageUrl(animeDetails.getMainPicture().getLarge());
+                            anime.setMean(animeDetails.getMean() != 0 ? String.valueOf(animeDetails.getMean()) : "N/A");
+                            anime.setStatus(Status.valueOf(animeDetails.getStatus()));
+                            anime.setNumEpisodes(animeDetails.getNumEpisodes() != 0 ? String.valueOf(animeDetails.getNumEpisodes()) : "?");
+
+                            animeList.add(anime);
+                        }
+                    }
+
+                    if (responseCount.decrementAndGet() == 0) {
+                        callback.onSuccess(animeList);
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
-        callback.onSuccess(animeList);
+                @Override
+                public void onFailure(Call<AnimeDetails> call, Throwable t) {
+                    if (responseCount.decrementAndGet() == 0) {
+                        callback.onSuccess(animeList);
+                    }
+                }
+            });
+        }
     }
 
     public interface AnimeCallback {

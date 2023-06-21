@@ -43,6 +43,7 @@ public class AnimeSearchAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = layoutInflater.inflate(R.layout.anime_search_row, parent, false);
+        view.setMinimumHeight(200);
         TextView title = view.findViewById(R.id.animeTitle);
         TextView episodes = view.findViewById(R.id.animeEpisodes);
         TextView score = view.findViewById(R.id.animeScore);
@@ -52,7 +53,10 @@ public class AnimeSearchAdapter extends BaseAdapter {
         episodes.setText(animeList.get(position).getNumEpisodes());
         score.setText(animeList.get(position).getMean());
         status.setText(animeList.get(position).getStatus().getString());
-        Picasso.get().load(animeList.get(position).getImageUrl()).into(image);
+        Picasso.get()
+                .load(animeList.get(position).getImageUrl())
+                .resize(image.getWidth(), 500)
+                .into(image);
         return view;
     }
 }
