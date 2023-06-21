@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/animeImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars"
+        android:contentDescription="@string/anime_imageSample" />
+
+    <TextView
+        android:id="@+id/animeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/animetitleSample"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/animeImageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/animeEpisodesTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/episodesTitle"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/animeImageView"
+        app:layout_constraintEnd_toStartOf="@+id/animeTitle"
+        app:layout_constraintStart_toEndOf="@+id/animeImageView"
+        app:layout_constraintTop_toBottomOf="@+id/animeTitle" />
+
+    <TextView
+        android:id="@+id/animeEpisodes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/animeepisodesSample"
+        app:layout_constraintEnd_toEndOf="@+id/animeEpisodesTitle"
+        app:layout_constraintStart_toStartOf="@+id/animeEpisodesTitle"
+        app:layout_constraintTop_toBottomOf="@+id/animeEpisodesTitle" />
+
+    <TextView
+        android:id="@+id/animeScoreTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/meanScoreTitle"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/animeImageView"
+        app:layout_constraintEnd_toStartOf="@+id/animeStatusTitle"
+        app:layout_constraintStart_toEndOf="@+id/animeEpisodesTitle"
+        app:layout_constraintTop_toBottomOf="@+id/animeTitle" />
+
+    <TextView
+        android:id="@+id/animeScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/animescoreSample"
+        app:layout_constraintEnd_toEndOf="@+id/animeScoreTitle"
+        app:layout_constraintStart_toStartOf="@+id/animeScoreTitle"
+        app:layout_constraintTop_toBottomOf="@+id/animeScoreTitle" />
+
+    <TextView
+        android:id="@+id/animeStatusTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/statusTitle"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/animeImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/animeTitle"
+        app:layout_constraintTop_toBottomOf="@+id/animeTitle" />
+
+    <TextView
+        android:id="@+id/animeStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/animestatusSample"
+        app:layout_constraintEnd_toEndOf="@+id/animeStatusTitle"
+        app:layout_constraintStart_toStartOf="@+id/animeStatusTitle"
+        app:layout_constraintTop_toBottomOf="@+id/animeStatusTitle" />
+</androidx.constraintlayout.widget.ConstraintLayout>
