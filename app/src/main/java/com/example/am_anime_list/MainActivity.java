@@ -48,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Gimme finger")
-                .setSubtitle("Log in using your fingerprint")
+                .setTitle(getString(R.string.loginTitle))
+                .setSubtitle(getString(R.string.loginSubtitle))
                 .setAllowedAuthenticators(BIOMETRIC_STRONG | DEVICE_CREDENTIAL)
                 .build();
         Button biometricLoginButton = findViewById(R.id.biometric_login);

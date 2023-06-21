@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Anime manager</string>
     <string name="loginButtonText">Log in</string>
+    <string name="loginTitle">Gimme finger</string>
+    <string name="loginSubtitle">Log in using your fingerprint</string>
 </resources>
