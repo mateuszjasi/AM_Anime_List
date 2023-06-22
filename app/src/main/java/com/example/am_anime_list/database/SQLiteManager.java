@@ -83,7 +83,7 @@ public class SQLiteManager extends SQLiteOpenHelper {
         try (Cursor result = sqLiteDatabase.rawQuery(
                 "SELECT * FROM " + TABLE_NAME +
                         " WHERE " + COLUMN_TITLE + " LIKE " + "'%" + title + "%'" +
-                        " ORDER BY " + COLUMN_STATUS +
+                        " ORDER BY " + COLUMN_STATUS + " DESC "+
                         " LIMIT " + limit + " OFFSET " + offset,
                 null))
         {

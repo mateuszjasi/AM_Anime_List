@@ -98,6 +98,7 @@ public class DatabaseActivity extends AppCompatActivity {
             Spinner spinnerStatus = popupView.findViewById(R.id.spinnerAnimeStatus);
             String[] optionsStatus = {Status.watching.getString(),
                     Status.completed.getString(),
+                    Status.on_hold.getString(),
                     Status.dropped.getString(),
                     Status.plan_to_watch.getString()};
             ArrayAdapter<String> spinnerStatusAdapter = new ArrayAdapter<>(this,
