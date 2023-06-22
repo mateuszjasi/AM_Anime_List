@@ -3,7 +3,7 @@
     <string name="loginButtonText">Log in</string>
     <string name="loginTitle">Gimme finger</string>
     <string name="loginSubtitle">Log in using your fingerprint</string>
-    <string name="editTextTitle">Search anime...</string>
+    <string name="editTextTitle">Search anime…</string>
     <string name="episodesTitle">Episodes</string>
     <string name="meanScoreTitle">Mean Score</string>
     <string name="statusTitle">Status</string>
@@ -12,4 +12,5 @@
     <string name="animeepisodesSample">animeEpisodes</string>
     <string name="animetitleSample">animeTitle</string>
     <string name="anime_imageSample">Anime image</string>
+    <string name="SampleImage">https://cdn.discordapp.com/attachments/779026898672025684/1121426346061606992/HeKillYou.png</string>
 </resources>

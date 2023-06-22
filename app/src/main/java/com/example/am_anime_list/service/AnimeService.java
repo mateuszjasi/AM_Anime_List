@@ -1,13 +1,13 @@
 package com.example.am_anime_list.service;
 
-import android.util.Log;
+import androidx.annotation.NonNull;
 
+import com.example.am_anime_list.R;
 import com.example.am_anime_list.model.Anime;
 import com.example.am_anime_list.model.AnimeDetails;
 import com.example.am_anime_list.model.AnimeSearchResponse;
 import com.example.am_anime_list.model.Status;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -33,11 +32,15 @@ public class AnimeService {
         animeApi = retrofit.create(AnimeApi.class);
     }
 
-    public void getAnimeFromTitle(String title, int offset, int limit, final AnimeCallback callback) {
+    public void getAnimeFromTitle(String title,
+                                  int offset,
+                                  int limit,
+                                  final AnimeCallback callback) {
         Call<AnimeSearchResponse> call = animeApi.getAnimeFromTitle(apiValue, title, offset, limit);
         call.enqueue(new Callback<AnimeSearchResponse>() {
             @Override
-            public void onResponse(Call<AnimeSearchResponse> call, retrofit2.Response<AnimeSearchResponse> response) {
+            public void onResponse(@NonNull Call<AnimeSearchResponse> call,
+                                   @NonNull retrofit2.Response<AnimeSearchResponse> response) {
                 if (response.isSuccessful()) {
                     AnimeSearchResponse animeSearchResponse = response.body();
                     if (animeSearchResponse != null) {
@@ -52,7 +55,7 @@ public class AnimeService {
             }
 
             @Override
-            public void onFailure(Call<AnimeSearchResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<AnimeSearchResponse> call, @NonNull Throwable t) {
                 callback.onFailure(t);
             }
         });
@@ -71,17 +74,22 @@ public class AnimeService {
         for (Call<AnimeDetails> call : callList) {
             call.enqueue(new Callback<AnimeDetails>() {
                 @Override
-                public void onResponse(Call<AnimeDetails> call, retrofit2.Response<AnimeDetails> response) {
+                public void onResponse(@NonNull Call<AnimeDetails> call,
+                                       @NonNull retrofit2.Response<AnimeDetails> response) {
                     if (response.isSuccessful()) {
                         AnimeDetails animeDetails = response.body();
                         if (animeDetails != null) {
                             Anime anime = new Anime();
                             anime.setId(animeDetails.getId());
                             anime.setTitle(animeDetails.getTitle());
-                            anime.setImageUrl(animeDetails.getMainPicture().getLarge());
-                            anime.setMean(animeDetails.getMean() != 0 ? String.valueOf(animeDetails.getMean()) : "N/A");
+                            anime.setImageUrl(animeDetails.getMainPicture().getLarge() == null ?
+                                    String.valueOf(R.string.SampleImage) :
+                                    animeDetails.getMainPicture().getLarge());
+                            anime.setMean(animeDetails.getMean() != 0 ?
+                                    String.valueOf(animeDetails.getMean()) : "N/A");
                             anime.setStatus(Status.valueOf(animeDetails.getStatus()));
-                            anime.setNumEpisodes(animeDetails.getNumEpisodes() != 0 ? String.valueOf(animeDetails.getNumEpisodes()) : "?");
+                            anime.setNumEpisodes(animeDetails.getNumEpisodes() != 0 ?
+                                    String.valueOf(animeDetails.getNumEpisodes()) : "?");
 
                             animeList.add(anime);
                         }
@@ -93,10 +101,8 @@ public class AnimeService {
                 }
 
                 @Override
-                public void onFailure(Call<AnimeDetails> call, Throwable t) {
-                    if (responseCount.decrementAndGet() == 0) {
-                        callback.onSuccess(animeList);
-                    }
+                public void onFailure(@NonNull Call<AnimeDetails> call, @NonNull Throwable t) {
+                    callback.onFailure(t);
                 }
             });
         }

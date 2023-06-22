@@ -1,5 +1,6 @@
 package com.example.am_anime_list.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +16,10 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class AnimeSearchAdapter extends BaseAdapter {
-    private Context context;
     private final List<Anime> animeList;
     private final LayoutInflater layoutInflater;
 
     public AnimeSearchAdapter(Context context, List<Anime> animeList) {
-        this.context = context;
         this.animeList = animeList;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -42,7 +41,10 @@ public class AnimeSearchAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = layoutInflater.inflate(R.layout.anime_search_row, parent, false);
+        @SuppressLint("ViewHolder") View view = layoutInflater.inflate(
+                R.layout.anime_search_row,
+                parent,
+                false);
         view.setMinimumHeight(200);
         TextView title = view.findViewById(R.id.animeTitle);
         TextView episodes = view.findViewById(R.id.animeEpisodes);
