@@ -9,6 +9,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.am_anime_list.adapter.AnimeSearchAdapter;
 import com.example.am_anime_list.database.SQLiteManager;
@@ -23,11 +24,13 @@ public class DatabaseActivity extends AppCompatActivity {
     private String lastSearchedAnimeTitle = "";
     private boolean loadingMore = false, noMoreAnime = false;
     private AnimeSearchAdapter animeSearchAdapter;
+    private SQLiteManager sqLiteManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_database);
+        sqLiteManager = SQLiteManager.instanceOfDatabase(this);
         animeSearchAdapter = new AnimeSearchAdapter(this, animeList);
         EditText animeTitle = findViewById(R.id.editTextDatabaseTitle);
         ListView listView = findViewById(R.id.databaseResultList);
@@ -61,6 +64,16 @@ public class DatabaseActivity extends AppCompatActivity {
                 }
             }
         });
+
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            sqLiteManager.deleteAnime(animeList.get(position).getId());
+            Toast.makeText(getApplicationContext(),
+                        "Removed anime from your list!",
+                        Toast.LENGTH_SHORT).show();
+            animeList.remove(position);
+            animeSearchAdapter.notifyDataSetChanged();
+            return true;
+        });
     }
 
     @Override
@@ -75,7 +88,6 @@ public class DatabaseActivity extends AppCompatActivity {
     private void addAnimeToList() {
         if (loadingMore || noMoreAnime) return;
         loadingMore = true;
-        SQLiteManager sqLiteManager = SQLiteManager.instanceOfDatabase(this);
         List<Anime> resultList = sqLiteManager.getAnimeListArray(lastSearchedAnimeTitle,10, offset);
         if (resultList.size() == 0) {
             noMoreAnime = true;
