@@ -15,4 +15,8 @@
     <string name="SampleImage">https://cdn.discordapp.com/attachments/779026898672025684/1121426346061606992/HeKillYou.png</string>
     <string name="SearchingSwitchButtonText">Manager</string>
     <string name="DatabaseSwitchButtonText">Searching</string>
+    <string name="editAnimeButtonText">Save</string>
+    <string name="removeButtonText">-1</string>
+    <string name="addButtonText">+1</string>
+    <string name="sampleNumber">123</string>
 </resources>

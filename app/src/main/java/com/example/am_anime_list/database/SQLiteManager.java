@@ -71,7 +71,7 @@ public class SQLiteManager extends SQLiteOpenHelper {
         contentValues.put(COLUMN_TITLE, anime.getTitle());
         contentValues.put(COLUMN_STATUS, Status.watching.getString());
         contentValues.put(COLUMN_NUM_EPISODES, anime.getNumEpisodes());
-        contentValues.put(COLUMN_MEAN, "-");
+        contentValues.put(COLUMN_MEAN, "0");
         contentValues.put(COLUMN_PROGRESS, 0);
         sqLiteDatabase.insert(TABLE_NAME, null, contentValues);
     }
