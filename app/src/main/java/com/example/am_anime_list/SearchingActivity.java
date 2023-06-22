@@ -22,6 +22,7 @@ public class SearchingActivity extends AppCompatActivity {
     private int offset;
     private final List<Anime> animeList = new ArrayList<>();
     private AnimeSearchAdapter animeSearchAdapter;
+    private boolean loadingMore = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,17 +58,25 @@ public class SearchingActivity extends AppCompatActivity {
     }
 
     private void addAnimeToList() {
-        animeService.getAnimeFromTitle(lastSearchedAnimeTitle, offset, 10, new AnimeService.AnimeCallback() {
+        if (loadingMore) return;
+        loadingMore = true;
+        animeService.getAnimeFromTitle(lastSearchedAnimeTitle,
+                offset,
+                10,
+                new AnimeService.AnimeCallback() {
             @Override
             public void onSuccess(List<Anime> resultAnimeList) {
+                offset += 10;
                 animeList.addAll(resultAnimeList);
                 animeSearchAdapter.notifyDataSetChanged();
-                offset += 10;
+                loadingMore = false;
             }
 
             @Override
             public void onFailure(Throwable t) {
                 Toast.makeText(getApplicationContext(), "Nothing to load!", Toast.LENGTH_SHORT).show();
+                animeSearchAdapter.notifyDataSetChanged();
+                loadingMore = false;
             }
         });
     }
