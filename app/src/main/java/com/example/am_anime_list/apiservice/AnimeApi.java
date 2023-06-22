@@ -1,4 +1,4 @@
-package com.example.am_anime_list.service;
+package com.example.am_anime_list.apiservice;
 
 import com.example.am_anime_list.model.AnimeDetails;
 import com.example.am_anime_list.model.AnimeSearchResponse;

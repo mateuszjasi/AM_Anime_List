@@ -31,14 +31,15 @@ public class AnimeSearchAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return animeList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return animeList.get(position).getId();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         @SuppressLint("ViewHolder") View view = layoutInflater.inflate(
@@ -52,7 +53,13 @@ public class AnimeSearchAdapter extends BaseAdapter {
         TextView status = view.findViewById(R.id.animeStatus);
         ImageView image = view.findViewById(R.id.animeImageView);
         title.setText(animeList.get(position).getTitle());
-        episodes.setText(animeList.get(position).getNumEpisodes());
+        if (animeList.get(position).getProgress() == -1) {
+            episodes.setText(animeList.get(position).getNumEpisodes());
+        } else {
+            episodes.setText(animeList.get(position).getProgress() +
+                    " / " +
+                    animeList.get(position).getNumEpisodes());
+        }
         score.setText(animeList.get(position).getMean());
         status.setText(animeList.get(position).getStatus().getString());
         Picasso.get()

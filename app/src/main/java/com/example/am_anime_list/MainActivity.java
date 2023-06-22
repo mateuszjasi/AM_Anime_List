@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.concurrent.Executor;
@@ -24,26 +23,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = new Intent(this, SearchingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         Executor executor = ContextCompat.getMainExecutor(this);
-        biometricPrompt = new BiometricPrompt(MainActivity.this, executor, new BiometricPrompt.AuthenticationCallback() {
+        biometricPrompt = new BiometricPrompt(MainActivity.this,
+                executor,
+                new BiometricPrompt.AuthenticationCallback() {
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
-                Toast.makeText(getApplicationContext(), "Authentication error: " + errString, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),
+                        "Authentication error: " + errString,
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onAuthenticationSucceeded(
                     @NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                Toast.makeText(getApplicationContext(), "Authentication succeeded!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),
+                        "Authentication succeeded!",
+                        Toast.LENGTH_SHORT).show();
                 startActivity(intent);
             }
 
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
-                Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),
+                        "Authentication failed",
+                        Toast.LENGTH_SHORT).show();
             }
         });
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
@@ -51,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
                 .setSubtitle(getString(R.string.loginSubtitle))
                 .setAllowedAuthenticators(BIOMETRIC_STRONG | DEVICE_CREDENTIAL)
                 .build();
-        Button biometricLoginButton = findViewById(R.id.biometric_login);
-        biometricLoginButton.setOnClickListener(view -> biometricPrompt.authenticate(promptInfo));
+        findViewById(R.id.biometric_login).setOnClickListener(
+                view -> biometricPrompt.authenticate(promptInfo));
+        biometricPrompt.authenticate(promptInfo);
     }
 }

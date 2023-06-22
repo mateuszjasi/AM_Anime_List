@@ -7,6 +7,7 @@ public class Anime {
     private Status status;
     private String numEpisodes;
     private String mean;
+    private Integer progress;
 
     public Integer getId() {
         return id;
@@ -54,5 +55,13 @@ public class Anime {
 
     public void setMean(String mean) {
         this.mean = mean;
+    }
+
+    public Integer getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Integer progress) {
+        this.progress = progress;
     }
 }

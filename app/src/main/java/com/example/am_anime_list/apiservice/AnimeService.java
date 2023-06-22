@@ -1,4 +1,4 @@
-package com.example.am_anime_list.service;
+package com.example.am_anime_list.apiservice;
 
 import androidx.annotation.NonNull;
 
@@ -90,6 +90,7 @@ public class AnimeService {
                             anime.setStatus(Status.valueOf(animeDetails.getStatus()));
                             anime.setNumEpisodes(animeDetails.getNumEpisodes() != 0 ?
                                     String.valueOf(animeDetails.getNumEpisodes()) : "?");
+                            anime.setProgress(-1);
 
                             animeList.add(anime);
                         }

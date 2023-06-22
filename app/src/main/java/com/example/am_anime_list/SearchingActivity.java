@@ -2,16 +2,20 @@ package com.example.am_anime_list;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.am_anime_list.adapter.AnimeSearchAdapter;
+import com.example.am_anime_list.database.SQLiteManager;
 import com.example.am_anime_list.model.Anime;
-import com.example.am_anime_list.service.AnimeService;
+import com.example.am_anime_list.apiservice.AnimeService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +32,16 @@ public class SearchingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_searching);
+        SQLiteManager sqLiteManager = SQLiteManager.instanceOfDatabase(this);
         animeSearchAdapter = new AnimeSearchAdapter(this, animeList);
         EditText animeTitle = findViewById(R.id.editTextAnimeTitle);
         ListView listView = findViewById(R.id.resultList);
         listView.setAdapter(animeSearchAdapter);
+        Intent intent = new Intent(this, DatabaseActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        findViewById(R.id.switchViewButton).setOnClickListener(view ->
+                startActivity(intent));
+
         animeTitle.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
                 offset = 0;
@@ -42,6 +52,7 @@ public class SearchingActivity extends AppCompatActivity {
             }
             return false;
         });
+
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -55,6 +66,19 @@ public class SearchingActivity extends AppCompatActivity {
             }
         });
 
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            if (sqLiteManager.checkID(animeList.get(position).getId())) {
+                Toast.makeText(getApplicationContext(),
+                        "Anime is already in your list!",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                sqLiteManager.addAnimeToDatabase(animeList.get(position));
+                Toast.makeText(getApplicationContext(),
+                        "Anime added to your list!",
+                        Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        });
     }
 
     private void addAnimeToList() {
