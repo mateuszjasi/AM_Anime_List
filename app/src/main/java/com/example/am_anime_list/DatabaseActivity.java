@@ -36,7 +36,6 @@ public class DatabaseActivity extends AppCompatActivity {
     private AnimeSearchAdapter animeSearchAdapter;
     private SQLiteManager sqLiteManager;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,17 +50,8 @@ public class DatabaseActivity extends AppCompatActivity {
         findViewById(R.id.switchToSearchingButton).setOnClickListener(view ->
                 startActivity(intent));
 
-        animeTitle.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
-                offset = 0;
-                noMoreAnime = false;
-                animeList.clear();
-                lastSearchedAnimeTitle = animeTitle.getText().toString();
-                addAnimeToList();
-                return true;
-            }
-            return false;
-        });
+        animeTitle.setOnEditorActionListener((v, actionId, event) ->
+                setupSearchAnime(actionId, animeTitle));
 
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -69,87 +59,30 @@ public class DatabaseActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            public void onScroll(AbsListView view,
+                                 int firstVisibleItem,
+                                 int visibleItemCount,
+                                 int totalItemCount) {
                 if (totalItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount) {
                     addAnimeToList();
                 }
             }
         });
 
-        listView.setOnItemLongClickListener((parent, view, position, id) -> {
-            sqLiteManager.deleteAnime(animeList.get(position).getId());
-            Toast.makeText(getApplicationContext(),
-                        "Removed anime from your list!",
-                        Toast.LENGTH_SHORT).show();
-            animeList.remove(position);
-            animeSearchAdapter.notifyDataSetChanged();
-            return true;
-        });
+        listView.setOnItemLongClickListener((parent, view, position, id) ->
+                setupRemoveAnime(position));
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
             Anime selectedAnime = animeList.get(position);
-            @SuppressLint("InflateParams") View popupView = getLayoutInflater().
-                    inflate(R.layout.edit_anime_popup, null);
-            PopupWindow popupWindow = new PopupWindow(
-                    popupView,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            Spinner spinnerStatus = popupView.findViewById(R.id.spinnerAnimeStatus);
-            String[] optionsStatus = {Status.watching.getString(),
-                    Status.completed.getString(),
-                    Status.on_hold.getString(),
-                    Status.dropped.getString(),
-                    Status.plan_to_watch.getString()};
-            ArrayAdapter<String> spinnerStatusAdapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_spinner_item,
-                    optionsStatus);
-            spinnerStatus.setAdapter(spinnerStatusAdapter);
-            int defaultSelectionIndex = -1;
-            for (int i = 0; i < optionsStatus.length; i++) {
-                if (optionsStatus[i].equals(selectedAnime.getStatus().getString())) {
-                    defaultSelectionIndex = i;
-                    break;
-                }
-            }
-            TextView episodesView = popupView.findViewById(R.id.animeProgress);
-            episodesView.setText(selectedAnime.getProgress().toString());
-            popupView.findViewById(R.id.addProgress).setOnClickListener(v -> {
-                int progress = Integer.parseInt(String.valueOf(episodesView.getText()));
-                if (progress < Integer.parseInt(selectedAnime.getNumEpisodes())) {
-                    episodesView.setText(String.valueOf(progress + 1));
-                }
-            });
-            popupView.findViewById(R.id.removeProgress).setOnClickListener(v -> {
-                int progress = Integer.parseInt(String.valueOf(episodesView.getText()));
-                if (progress > 0) {
-                    episodesView.setText(String.valueOf(progress - 1));
-                }
-            });
-            spinnerStatus.setSelection(defaultSelectionIndex);
-            Spinner spinnerScore = popupView.findViewById(R.id.spinnerAnimeScore);
-            String[] optionsScore = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-            ArrayAdapter<String> spinnerScoreAdapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_spinner_item,
-                    optionsScore);
-            spinnerScore.setAdapter(spinnerScoreAdapter);
-            spinnerScore.setSelection(Integer.parseInt(selectedAnime.getMean()));
-            popupView.findViewById(R.id.editAnimeButton).setOnClickListener(v -> {
-                selectedAnime.setProgress(Integer.parseInt(episodesView.getText().toString()));
-                selectedAnime.setMean(spinnerScore.getSelectedItem().toString());
-                selectedAnime.setStatus(Status.fromString(spinnerStatus.getSelectedItem().toString()));
-                sqLiteManager.updateAnime(selectedAnime);
-                animeSearchAdapter.notifyDataSetChanged();
-                Toast.makeText(getApplicationContext(),
-                        "Data edited",
-                        Toast.LENGTH_SHORT).show();
-                popupWindow.dismiss();
-            });
-            popupWindow.setOutsideTouchable(true);
-            popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-            popupWindow.setElevation(10f);
-            popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
-            popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+            View popupView = createPopupView();
+            PopupWindow popupWindow = createPopupWindow(popupView);
+            setupStatusSpinner(popupView, selectedAnime);
+            setupScoreSpinner(popupView, selectedAnime);
+            setupProgressTextView(popupView, selectedAnime);
+            setupAddProgressButton(popupView, selectedAnime);
+            setupRemoveProgressButton(popupView);
+            setupEditAnimeButton(popupView, popupWindow, selectedAnime);
+            showPopupWindow(view, popupWindow);
         });
     }
 
@@ -174,5 +107,124 @@ public class DatabaseActivity extends AppCompatActivity {
         }
         animeSearchAdapter.notifyDataSetChanged();
         loadingMore = false;
+    }
+
+    private boolean setupSearchAnime(int actionId, EditText animeTitle) {
+        if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
+            offset = 0;
+            noMoreAnime = false;
+            animeList.clear();
+            lastSearchedAnimeTitle = animeTitle.getText().toString();
+            addAnimeToList();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean setupRemoveAnime(int position) {
+        sqLiteManager.deleteAnime(animeList.get(position).getId());
+        Toast.makeText(getApplicationContext(),
+                "Removed anime from your list!",
+                Toast.LENGTH_SHORT).show();
+        animeList.remove(position);
+        animeSearchAdapter.notifyDataSetChanged();
+        return true;
+    }
+
+    @SuppressLint("InflateParams")
+    private View createPopupView() {
+        return getLayoutInflater().inflate(R.layout.edit_anime_popup, null);
+    }
+
+    private PopupWindow createPopupWindow(View popupView) {
+        return new PopupWindow(
+                popupView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+    }
+
+    private void setupStatusSpinner(View popupView, Anime anime) {
+        Spinner spinnerStatus = popupView.findViewById(R.id.spinnerAnimeStatus);
+        String[] optionsStatus = {Status.watching.getString(),
+                Status.completed.getString(),
+                Status.on_hold.getString(),
+                Status.dropped.getString(),
+                Status.plan_to_watch.getString()};
+        ArrayAdapter<String> spinnerStatusAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,
+                optionsStatus);
+        spinnerStatus.setAdapter(spinnerStatusAdapter);
+        int defaultSelectionIndex = -1;
+        for (int i = 0; i < optionsStatus.length; i++) {
+            if (optionsStatus[i].equals(anime.getStatus().getString())) {
+                defaultSelectionIndex = i;
+                break;
+            }
+        }
+        spinnerStatus.setSelection(defaultSelectionIndex);
+    }
+
+    private void setupScoreSpinner(View popupView, Anime anime) {
+        Spinner spinnerScore = popupView.findViewById(R.id.spinnerAnimeScore);
+        String[] optionsScore = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+        ArrayAdapter<String> spinnerScoreAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,
+                optionsScore);
+        spinnerScore.setAdapter(spinnerScoreAdapter);
+        spinnerScore.setSelection(Integer.parseInt(anime.getMean()));
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setupProgressTextView(View popupView, Anime anime) {
+        TextView episodesView = popupView.findViewById(R.id.animeProgress);
+        episodesView.setText(anime.getProgress().toString());
+    }
+
+    private void setupAddProgressButton(View popupView, Anime anime) {
+        popupView.findViewById(R.id.addProgress).setOnClickListener(v -> {
+            TextView episodesView = popupView.findViewById(R.id.animeProgress);
+            int progress = Integer.parseInt(String.valueOf(episodesView.getText()));
+            if (progress < Integer.parseInt(anime.getNumEpisodes())) {
+                episodesView.setText(String.valueOf(progress + 1));
+            }
+        });
+    }
+
+    private void setupRemoveProgressButton(View popupView) {
+        popupView.findViewById(R.id.removeProgress).setOnClickListener(v -> {
+            TextView episodesView = popupView.findViewById(R.id.animeProgress);
+            int progress = Integer.parseInt(String.valueOf(episodesView.getText()));
+            if (progress > 0) {
+                episodesView.setText(String.valueOf(progress - 1));
+            }
+        });
+    }
+
+    private void setupEditAnimeButton(View popupView, PopupWindow popupWindow, Anime anime) {
+        popupView.findViewById(R.id.editAnimeButton).setOnClickListener(v -> {
+            TextView episodesView = popupView.findViewById(R.id.animeProgress);
+            Spinner spinnerScore = popupView.findViewById(R.id.spinnerAnimeScore);
+            Spinner spinnerStatus = popupView.findViewById(R.id.spinnerAnimeStatus);
+
+            anime.setProgress(Integer.parseInt(episodesView.getText().toString()));
+            anime.setMean(spinnerScore.getSelectedItem().toString());
+            anime.setStatus(Status.fromString(spinnerStatus.getSelectedItem().toString()));
+
+            sqLiteManager.updateAnime(anime);
+            animeSearchAdapter.notifyDataSetChanged();
+            Toast.makeText(getApplicationContext(),
+                    "Data edited",
+                    Toast.LENGTH_SHORT).show();
+            popupWindow.dismiss();
+        });
+    }
+
+    private void showPopupWindow(View anchorView, PopupWindow popupWindow) {
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        popupWindow.setElevation(10f);
+        popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
+        popupWindow.showAtLocation(anchorView, Gravity.CENTER, 0, 0);
     }
 }

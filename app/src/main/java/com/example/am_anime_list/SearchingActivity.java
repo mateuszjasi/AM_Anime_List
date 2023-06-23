@@ -4,10 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -42,16 +40,8 @@ public class SearchingActivity extends AppCompatActivity {
         findViewById(R.id.switchViewButton).setOnClickListener(view ->
                 startActivity(intent));
 
-        animeTitle.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
-                offset = 0;
-                animeList.clear();
-                lastSearchedAnimeTitle = animeTitle.getText().toString();
-                addAnimeToList();
-                return true;
-            }
-            return false;
-        });
+        animeTitle.setOnEditorActionListener((v, actionId, event) ->
+                setupSearchAnime(actionId, animeTitle));
 
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -103,5 +93,16 @@ public class SearchingActivity extends AppCompatActivity {
                 loadingMore = false;
             }
         });
+    }
+
+    private boolean setupSearchAnime(int actionId, EditText animeTitle) {
+        if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
+            offset = 0;
+            animeList.clear();
+            lastSearchedAnimeTitle = animeTitle.getText().toString();
+            addAnimeToList();
+            return true;
+        }
+        return false;
     }
 }
