@@ -49,10 +49,12 @@ public class SearchingActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (totalItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount) {
+            public void onScroll(AbsListView view,
+                                 int firstVisibleItem,
+                                 int visibleItemCount,
+                                 int totalItemCount) {
+                if (totalItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount)
                     addAnimeToList();
-                }
             }
         });
 
@@ -88,7 +90,9 @@ public class SearchingActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Throwable t) {
-                Toast.makeText(getApplicationContext(), "Nothing to load!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),
+                        "Nothing to load!",
+                        Toast.LENGTH_SHORT).show();
                 animeSearchAdapter.notifyDataSetChanged();
                 loadingMore = false;
             }

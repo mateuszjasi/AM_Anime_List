@@ -63,9 +63,8 @@ public class DatabaseActivity extends AppCompatActivity {
                                  int firstVisibleItem,
                                  int visibleItemCount,
                                  int totalItemCount) {
-                if (totalItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount) {
+                if (totalItemCount > 0 && firstVisibleItem + visibleItemCount == totalItemCount)
                     addAnimeToList();
-                }
             }
         });
 
